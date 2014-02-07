@@ -1,4 +1,4 @@
-var fxstrDirectives = angular.module( "fxstr.directives.typeahead", [] )
+angular.module( "fxstr.directives.typeahead", [] )
 
 
 
@@ -8,6 +8,8 @@ var fxstrDirectives = angular.module( "fxstr.directives.typeahead", [] )
 
 	this.filter = function( data, searchTermFunction, searchString ) {
 		
+		console.log( "typeahead-filter %o", data );
+
 		var ret = [];
 		for( var i = 0; i < data.length; i++ ) {
 			var term = searchTermFunction()( data[ i ] );
@@ -123,7 +125,7 @@ var fxstrDirectives = angular.module( "fxstr.directives.typeahead", [] )
 			.on( "focus", function() {
 				scope.$apply( function() {
 					scope.elementFocussed = true;
-					console.log( "focus" );
+					//console.log( "focus" );
 					//console.log( "matches on focus: %o", scope.matches );
 				} );
 			} )
@@ -229,7 +231,7 @@ var fxstrDirectives = angular.module( "fxstr.directives.typeahead", [] )
 			var liNr 		= angular.element( ev.target ).index()
 				, match 	= scope.matches[ liNr ];
 
-			console.error( "liNr %o, match %o, matches %o", liNr, match, scope.matches );
+			//console.error( "liNr %o, match %o, matches %o", liNr, match, scope.matches );
 
 			originalScope.selectHandler()( match );
 				

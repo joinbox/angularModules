@@ -56,6 +56,11 @@ app.controller( 'typeaheadTestController', [ '$scope', function( $scope ) {
 	} ]
 
 
+	$scope.getAllResults = function() {
+		return $scope.allResults;
+	}
+
+
 	var defaultResults = [ { 
 			id: 1
 			, name: "default" 

@@ -80,7 +80,31 @@ describe('Typeahead Directive', function() {
 
 
 
-	it( "displays the correct results", function() {
+
+
+	it( "displays the correct results when a function is provided as data-source", function() {
+
+		var el = angular.element( html );
+		el.attr( "typeahead-data-source", "getAllResults()" );
+		var element = $compile( el )( $rootScope );
+		$rootScope.$digest();
+
+		element.val( "ar" );
+		element.triggerHandler( "change" );
+		expect( element.next().find( "li:not(.more-results)" ).length ).toBe( 3 );
+
+		expect( element.next().html() ).toContain( "Delaware" );
+		expect( element.next().html() ).toContain( "Arizona" );
+		expect( element.next().html() ).toContain( "Arkansas" );
+
+	} );
+
+
+
+
+
+
+	it( "displays the correct results when an array is provided as data-source", function() {
 
 		var element = $compile( html )( $rootScope );
 		$rootScope.$digest();
