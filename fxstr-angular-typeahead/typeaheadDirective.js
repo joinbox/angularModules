@@ -8,7 +8,7 @@ angular.module( "fxstr.directives.typeahead", [] )
 
 	this.filter = function( data, searchTermFunction, searchString ) {
 		
-		console.log( "typeahead-filter %o", data );
+		//console.log( "typeahead-filter %o", data );
 
 		var ret = [];
 		for( var i = 0; i < data.length; i++ ) {
@@ -182,15 +182,23 @@ angular.module( "fxstr.directives.typeahead", [] )
 				case 13:
 					ev.preventDefault();
 					var match = scope.matches[ scope.activeIndex ];
-
-					emptyInput();
-
-					originalScope.selectHandler()( match );
+					scope.elementSelectedHandler( match );
 					break;
 
 			}
 
 		} );
+
+
+
+
+		scope.elementSelectedHandler = function( item ) {
+
+			scope.selectHandler()( item );
+			emptyInput();
+
+		}
+
 
 
 
@@ -202,42 +210,14 @@ angular.module( "fxstr.directives.typeahead", [] )
 			, "too-many-results" 	: 'tooManyResults'
 			, "active-index" 		: 'activeIndex'
 			, "no-results" 			: "noResults"
+			, "max-result-count"	: maxResultCount
+			, "select-handler" 		: "elementSelectedHandler"
 		} );
 
 
-		// Click on results
-		resultListElement.bind( 'mousedown', function( ev ) {
-
-			// No result or moreResults
-			if( liNr > maxResultCount - 1 ) {
-				console.log( "Clicked «more results», don't call selectHandler" );
-				return;
-			}
-
-			// NO results
-			if( scope.noResults ) {
-				console.log( "Can't call selectHandler, no results" );
-			}
-
-			ev.preventDefault();
-			var isLi		= angular.element( ev.target ).is( "li" );
-
-			// Didn't click a li
-			if( !isLi ) {
-				console.log( "Clicked outside of a li, don't call selectHandler" );
-				return;
-			}
-
-			var liNr 		= angular.element( ev.target ).index()
-				, match 	= scope.matches[ liNr ];
-
-			//console.error( "liNr %o, match %o, matches %o", liNr, match, scope.matches );
-
-			originalScope.selectHandler()( match );
-				
-			emptyInput();
-
-		} );
+		if( attributes.typeaheadTemplateUrl ) {
+			resultListElement.attr( 'template-url', attributes.typeaheadTemplateUrl );
+		}
 
 
 
@@ -272,26 +252,71 @@ angular.module( "fxstr.directives.typeahead", [] )
 		}
 	}
 
+
 } )
 
 
 
-.directive( "typeaheadResultList", function() {
 
-	function link( originalScope, element, attributes ) {
+
+
+
+
+
+.directive( "typeaheadResultList", [ "$http", "$templateCache", "$compile", function( $http, $templateCache, $compile ) {
+
+	function link( scope, element, attributes ) {
+
 
 		// Returns true, if idx is the currently active index (selected by mouse/arrow keys)
-		originalScope.isActive = function( idx ) {
-			return originalScope.activeIndex == idx;
+		scope.isActive = function( idx ) {
+			return scope.activeIndex == idx;
 		}
 
-		// Don't take focus from input when mouse goes down – therefore don't wait for click
-		/*element.on( "mousedown", function( ev ) {
+
+		// Templating stuff
+		var templateUrl = attributes.templateUrl || "templates/resultListTemplate.html";
+
+		$http.get( templateUrl, { cache: $templateCache } ).success( function (templateContent ) {
+			element.empty().append( $compile( templateContent )( scope ) );
+		} );
+
+
+
+		element.bind( 'mousedown', function( ev ) {
+
 			ev.preventDefault();
-			console.error( ev.target );
-			alert("OK");
-			element.trigger( "mouseup" );
-		} ); */
+
+			//console.log( "click %o", ev.target );
+
+
+			// Didn't click a li
+			if( !angular.element( ev.target ).is( "li" ) ) {
+				console.log( "Clicked outside of a li, don't call selectHandler" );
+				return;
+			}
+
+
+			var liNr 		= angular.element( ev.target ).index()
+				, match 	= scope.matches[ liNr ];
+
+			// No result or moreResults
+			if( liNr > scope.maxResultCount - 1 ) {
+				console.log( "Clicked «more results», don't call selectHandler" );
+				return;
+			}
+
+			// NO results
+			if( scope.noResults ) {
+				console.log( "Can't call selectHandler, no results" );
+			}
+
+			scope.selectHandler()( match );
+				
+
+		} );
+
+	
 
 	}
 
@@ -299,7 +324,7 @@ angular.module( "fxstr.directives.typeahead", [] )
 	return {
 		restrict 		: "C"
 		, link 			: link
-		, templateUrl	: "resultListTemplate.html"
+		/*, templateUrl	: "templates/resultListTemplate.html"*/
 		, scope 		: {
 
 			// List of all matches
@@ -313,30 +338,23 @@ angular.module( "fxstr.directives.typeahead", [] )
 
 			// True, if no results were found; else false
 			, noResults 		: '='
+
+			// Max number of results to be displayed
+			, maxResultCount 	: '='
+
+			// Handler to be called on select
+			, selectHandler 	: '&'
+
 		}
 	}
-} )
+} ] )
 
 
-/*app.directive( "typeaheadResultListItem", function() {
 
-	function link( scope, element, attributes ) {
-
-	}
-
-
-	return {
-		restrict 	: "C"
-		, link 		: link
-		, template: 
-	}
-
-
-} );*/
 
 
 .run(function($templateCache) {
-  $templateCache.put( "resultListTemplate.html", "<div class='no-results' ng-show='noResults'>NOPE</div><ul ng-hide='noResults'><li ng-repeat='match in matches' ng-class='{active: isActive($index)}'>{{match.id}}<br/>{{match.name}}</li><li class='more-results' ng-show='tooManyResults'>… and {{tooManyResults}} more</li></ul>" );
+	$templateCache.put( "templates/resultListTemplate.html", "<div class='no-results' ng-show='noResults'>NOPE</div><ul ng-hide='noResults'><li ng-repeat='match in matches' ng-class='{active: isActive($index)}'>{{match.id}}<br/>{{match.name}}</li><li class='more-results' ng-show='tooManyResults'>… and {{tooManyResults}} more</li></ul>" );
 });
 
 
