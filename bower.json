@@ -14,7 +14,7 @@
     "dropdown"
   ],
   "dependencies": {
-    "angular": "1.2.9",
+    "angular": "1.2.9"
   }, 
   "license": "MIT",
   "homepage": "http://joinbox.com",
