@@ -420,8 +420,6 @@ describe('Typeahead Directive', function() {
 			expect( $rootScope.selectHandlerCallback ).toHaveBeenCalledWith( arg );
 
 
-			
-
 		} );
 
 
@@ -429,6 +427,46 @@ describe('Typeahead Directive', function() {
 
 
 
+
+
+	describe( "insert after", function() {
+
+		it( "inserts the result list after typeahead-insert-after, if provided", function() {
+
+
+			var outerHTML = function( el ) {
+				return el.appendTo( angular.element( "<div></div>" ) ).html();
+			}
+
+
+			var body = angular.element( document ).find( "body" );
+
+
+			var el = angular.element( "<div class='inner'>" + html + "</div>" );
+			el.find( "input" ).attr( 'typeahead-insert-after', '.inner' );
+
+
+			// Append wrapper to body before $compile, as it is needed in the compilation phase 
+			// to append result-list
+			body.append( el );
+
+
+			// Compile el
+			var element = $compile( el )( $rootScope );
+
+			//console.log( body.html() );
+			expect( body.find( ".inner" ).next().hasClass( 'typeahead-result-list') ).toBe( true );
+
+
+			// Remove from body
+			afterEach( function() {
+				angular.element( document ).find( "body" ).find( ".inner" ).remove();
+			} );
+
+		} );
+
+
+	} );
 
 
 
