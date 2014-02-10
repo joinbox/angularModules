@@ -220,9 +220,15 @@ angular.module( "fxstr.directives.typeahead", [] )
 		}
 
 
+		// Insert resultList after typeahead-insert-after or input
+		var compiled = $compile( resultListElement )( scope );
+		if( scope.insertAfter ) {
+			$document.find( scope.insertAfter ).after( compiled );
+		}
+		else {
+			element.after( compiled );
+		}
 
-		// Insert resultList after input
-		element.after( $compile( resultListElement )( scope ) );
 	
 
 
@@ -248,6 +254,8 @@ angular.module( "fxstr.directives.typeahead", [] )
 
 			// Function to be called on select
 			, selectHandler 		: "&typeaheadSelectHandler" 
+
+			, insertAfter 			: "@typeaheadInsertAfter"
 
 		}
 	}
