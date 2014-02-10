@@ -53,6 +53,21 @@ app.controller( 'typeaheadTestController', [ '$scope', function( $scope ) {
 		}, {
 			id: 16
 			, name: "Kentucky"
+		}, {
+			id: 17
+			, name: "Kentucky Pomme"
+		}, {
+			id: 18
+			, name: "Kentucky90912Pomme"
+		}, {
+			id: 19
+			, name: "9123Indiana"
+		}, {
+			id: 20
+			, name: "Kentucky...Pomme"
+		}, {
+			id: 21
+			, name: "Kentucky?;pomme"
 	} ]
 
 

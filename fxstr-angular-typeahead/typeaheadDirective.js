@@ -9,11 +9,12 @@ angular.module( "fxstr.directives.typeahead", [] )
 	this.filter = function( data, searchTermFunction, searchString ) {
 		
 		//console.log( "typeahead-filter %o", data );
+		var rgx = new RegExp( "([^a-z0-9]|\\b)" + searchString, "i" );
 
 		var ret = [];
 		for( var i = 0; i < data.length; i++ ) {
 			var term = searchTermFunction()( data[ i ] );
-			if( term.toLowerCase().indexOf( searchString.toLowerCase() ) > -1 ) {
+			if( rgx.test( term ) ) {
 				ret.push( data[ i ] );
 			}
 		}

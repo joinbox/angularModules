@@ -134,9 +134,8 @@ describe('Typeahead Directive', function() {
 
 			element.val( "ar" );
 			element.triggerHandler( "change" );
-			expect( element.next().find( "li:not(.more-results)" ).length ).toBe( 3 );
+			expect( element.next().find( "li:not(.more-results)" ).length ).toBe( 2 );
 
-			expect( element.next().html() ).toContain( "Delaware" );
 			expect( element.next().html() ).toContain( "Arizona" );
 			expect( element.next().html() ).toContain( "Arkansas" );
 
@@ -154,13 +153,34 @@ describe('Typeahead Directive', function() {
 
 			element.val( "ar" );
 			element.triggerHandler( "change" );
-			expect( element.next().find( "li:not(.more-results)" ).length ).toBe( 3 );
+			expect( element.next().find( "li:not(.more-results)" ).length ).toBe( 2 );
 
-			expect( element.next().html() ).toContain( "Delaware" );
 			expect( element.next().html() ).toContain( "Arizona" );
 			expect( element.next().html() ).toContain( "Arkansas" );
 
 		} );
+
+
+
+
+
+		it( "displays results that match searchString", function() {
+
+			var element = $compile( html )( $rootScope );
+			$rootScope.$digest();
+
+			element.val( "po" ).triggerHandler( "change" );
+			expect( element.next().find( "li:not(.more-results)" ).length ).toBe( 3 );
+
+			//console.error( element.next().html())
+
+			/*expect( element.next().html() ).toContain( "Delaware" );
+			expect( element.next().html() ).toContain( "Arizona" );
+			expect( element.next().html() ).toContain( "Arkansas" );*/
+
+		} );
+
+
 
 
 
@@ -176,7 +196,10 @@ describe('Typeahead Directive', function() {
 
 		it( "displays 'more available' when too many results were found", function() {
 
-			var element = $compile( html )( $rootScope );
+			var el = angular.element( html );
+			el.attr( 'typeahead-max-results', 2 );
+
+			var element = $compile( el )( $rootScope );
 			$rootScope.$digest();
 
 			element.val( "a" );
@@ -187,17 +210,17 @@ describe('Typeahead Directive', function() {
 			expect( moreResults.hasClass( "ng-hide" ) ).toBe( false );
 
 			// «9 more» shall be displayed
-			expect( moreResults.text() ).toContain( "9" );
+			expect( moreResults.text() ).toContain( "2" );
 
-			// Check length of all results (5 + 'more available' );
-			expect( element.next().find( "li" ).length ).toBe( 6 );
+			// Check length of all results (2 + 'more available' );
+			expect( element.next().find( "li" ).length ).toBe( 3 );
 
 
 			// Removes 'more available' when no more are available
 			element.val( "ar" );
 			element.triggerHandler( "change" );
 
-			expect( element.next().find( "li:not(.more-results)" ).length ).toBe( 3 );
+			expect( element.next().find( "li:not(.more-results)" ).length ).toBe( 2 );
 
 
 
