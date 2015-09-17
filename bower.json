@@ -2,8 +2,12 @@
   "name": "fxstr-angular-typeahead",
   "main": "typeaheadDirective.js",
   "version": "1.0.0",
-  "authors": [
-    "Felix Steiner <felix@joinbox.com>"
+  "authors"       : [
+    { 
+      "name"      : "Felix Steiner"
+      , "email"   : "felix@joinbox.com"
+      , "homepage"  : "http://joinbox.com" 
+    }
   ],
   "description": "Simple typeahead directive for angular",
   "keywords": [
@@ -17,7 +21,6 @@
     "angular": "1.2.9"
   }, 
   "license": "MIT",
-  "homepage": "http://joinbox.com",
   "ignore": [
     "**/.*",
     "node_modules",
@@ -25,4 +28,8 @@
     "test",
     "tests"
   ]
+  , "repository"      : {
+    "type"        : "git"
+    , "url"       : "git://github.com/joinbox/angularModules.git"
+  }
 }
