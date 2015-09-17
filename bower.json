@@ -1,7 +1,7 @@
 {
   "name": "fxstr-angular-typeahead",
   "main": "typeaheadDirective.js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "authors"       : [
     { 
       "name"      : "Felix Steiner"
@@ -18,7 +18,7 @@
     "dropdown"
   ],
   "dependencies": {
-    "angular": "1.2.9"
+    "angular": ">=1.2.0"
   }, 
   "license": "MIT",
   "ignore": [
