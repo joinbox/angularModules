@@ -19,26 +19,29 @@ angular.module( "fxstr.directives.typeahead", [] )
 			}
 		}
 
+		console.log( 'typeaheadFilter: Display results %o', ret );
+
 		return ret;
 
-	}
+	};
 
 } )
 
 
 
-.directive( "typeaheadDirective", function( $compile, $parse, typeaheadFilter, $document ) {
+.directive( "typeaheadDirective", function( $compile, $parse, typeaheadFilter ) {
 
 	function link( originalScope, element, attributes, modelCtrl ) {
+
 
 		// Get max number of results to display
 		var maxResultCount = originalScope.$eval( attributes.typeaheadMaxResults ) || 0;
 
 		// Create new scope (clone from original) to not mess original scope up
-		var scope = originalScope.$new();
-		originalScope.$on('$destroy', function(){
+		//var scope = originalScope.$new();
+		/*originalScope.$on('$destroy', function(){
 			scope.$destroy();
-		} );
+		} );*/
 		var scope = originalScope;
 
 		// Function needed on esc, after enter and to initialize
@@ -56,9 +59,7 @@ angular.module( "fxstr.directives.typeahead", [] )
 		// As it calls $parsers on modelCtrl, resetMatches is called as well
 		function emptyInput() {
 			element.val( "" );
-			element.trigger( "input" );
-			//modelCtrl.$setViewValue( "" );
-			//scope.$digest();
+			element[ 0 ].dispatchEvent( new Event( 'input' ) );
 		}
 
 
@@ -80,6 +81,8 @@ angular.module( "fxstr.directives.typeahead", [] )
 
 		// Update scope (matches, tooManyResults, noResults) to fit user's input (searchTerm)
 		function compileMatches( searchTerm ) {
+
+			console.log( 'typeaheadDirective: searched for %o', searchTerm );
 
 			// Reset all variables
 			resetMatches();
@@ -109,7 +112,7 @@ angular.module( "fxstr.directives.typeahead", [] )
 			}
 
 			// Check, if no results were found
-			scope.noResults = ( res.length == 0 );
+			scope.noResults = ( res.length === 0 );
 
 			// Update matches on scope
 			scope.matches = res;
@@ -150,7 +153,7 @@ angular.module( "fxstr.directives.typeahead", [] )
 					ev.preventDefault();
 					if( scope.activeIndex < scope.matches.length - 1 ) {
 						scope.$apply( function() {
-							scope.activeIndex++
+							scope.activeIndex++;
 						} );
 					}
 					//console.log( " + " + scope.activeIndex );
@@ -198,7 +201,7 @@ angular.module( "fxstr.directives.typeahead", [] )
 			scope.selectHandler()( item );
 			emptyInput();
 
-		}
+		};
 
 
 
@@ -224,7 +227,7 @@ angular.module( "fxstr.directives.typeahead", [] )
 		// Insert resultList after typeahead-insert-after or input
 		var compiled = $compile( resultListElement )( scope );
 		if( scope.insertAfter ) {
-			$document.find( scope.insertAfter ).after( compiled );
+			angular.element( document.querySelectorAll( scope.insertAfter ) ).after( compiled );
 		}
 		else {
 			element.after( compiled );
@@ -259,7 +262,7 @@ angular.module( "fxstr.directives.typeahead", [] )
 			, insertAfter 			: "@typeaheadInsertAfter"
 
 		}
-	}
+	};
 
 
 } )
@@ -280,13 +283,14 @@ angular.module( "fxstr.directives.typeahead", [] )
 		// Returns true, if idx is the currently active index (selected by mouse/arrow keys)
 		scope.isActive = function( idx ) {
 			return scope.activeIndex == idx;
-		}
+		};
 
 
 		// Templating stuff
 		var templateUrl = attributes.templateUrl || "templates/resultListTemplate.html";
 
 		$http.get( templateUrl, { cache: $templateCache } ).success( function (templateContent ) {
+			console.log( 'typeaheadResultList: append template %o', templateContent );
 			element.empty().append( $compile( templateContent )( scope ) );
 		} );
 
@@ -300,14 +304,15 @@ angular.module( "fxstr.directives.typeahead", [] )
 
 
 			// Didn't click a li
-			if( !angular.element( ev.target ).is( "li" ) ) {
+			if( ev.target.tagName !== 'LI' ) {
 				console.log( "Clicked outside of a li, don't call selectHandler" );
 				return;
 			}
 
 
-			var liNr 		= angular.element( ev.target ).index()
-				, match 	= scope.matches[ liNr ];
+			var liNr = getElementIndex( ev.target );
+
+			var match 	= scope.matches[ liNr ];
 
 			// No result or moreResults
 			if( liNr > scope.maxResultCount - 1 ) {
@@ -327,6 +332,22 @@ angular.module( "fxstr.directives.typeahead", [] )
 
 	
 
+	}
+
+
+	function getElementIndex( el ) {
+		var n = 0
+			, siblings = el.parentNode.childNodes;
+
+		for( var i = 0; i < siblings.length; i++ ) {
+			if( siblings[ i ] === el ) {
+				return n;
+			}
+			if( siblings[ i ].nodeType === 1 ) {
+				n++;
+			}
+		}
+		return -1;
 	}
 
 
@@ -355,7 +376,7 @@ angular.module( "fxstr.directives.typeahead", [] )
 			, selectHandler 	: '&'
 
 		}
-	}
+	};
 } ] )
 
 
